@@ -1,6 +1,14 @@
 import React from "react";
-import * as R from "ramda";
 import { css } from "glamor";
+
+import * as R from "ramda";
+import * as actions from "./actions";
+
+const CHANGE_NAME = "CHANGE_NAME";
+const CHANGE_SHOW_TYPE = "CHANGE_SHOW_TYPE";
+const ADD_ITEM = "ADD_ITEM";
+const DEFAULT = "DEFAULT";
+
 
 function UserItem(props) {
   const { isActive, ...otherProps } = props;
@@ -99,26 +107,25 @@ export default class UserList extends React.Component {
   state = {
     selectedList: "verified",
     showStatus: "all",
-    userName: "",
-    users: mockUsers
+    users: mockUsers,
+    userName: ""
   };
 
-  handleClick = showType => {
-    this.setState({ selectedList: showType });
+  reduce = action => {
+    console.log(action, actions, "ehllo");
+    const stateReducer = actions[action.type] || actions[DEFAULT];
+    console.log("BEFORE", this.state, action);
+    this.setState(stateReducer(action.payload), () => {
+      console.log("AFTER", this.state);
+    });
   };
 
-  handleStatus = event => {
-    this.setState({ showStatus: event.target.value });
-  };
   /* FP and state machine */
   getUsersList = () => {
-    const { showStatus, selectedList } = this.state;
-    return stateMachine[selectedList][showStatus](mockUsers);
+    const { showStatus, selectedList, users } = this.state;
+    console.log("showStatus", showStatus, selectedList);
+    return stateMachine[selectedList][showStatus](users);
   };
-  /* 
-     imperative implementation 
-
-  */
   render() {
     return (
       <div {...css({ width: "50%" })}>
@@ -158,7 +165,12 @@ export default class UserList extends React.Component {
           <select
             name="showStatus"
             id="show-status-menu"
-            onChange={this.handleStatus}
+            onChange={event =>
+              this.reduce({
+                type: CHANGE_NAME,
+                payload: { name: event.target.name, value: event.target.value }
+              })
+            }
             value={this.state.showStatus}
           >
             <option value="all">All</option>
@@ -186,7 +198,7 @@ export default class UserList extends React.Component {
             Add
           </button>
         </div>
-        {this.showSelectedList().map(user => (
+        {this.getUsersList().map(user => (
           <UserItem key={user.name} isActive={user.isActive}>
             {user.name}
           </UserItem>
