@@ -1,6 +1,12 @@
 import React from "react";
-import { Box, Flex, Text, Button } from "rebass";
+import { Box, Flex, Text, Button, Input } from "rebass";
 import * as R from "ramda";
+import * as actions from "./actions";
+
+const CHANGE_NAME = "CHANGE_NAME";
+const CHANGE_SHOW_TYPE = "CHANGE_SHOW_TYPE";
+const ADD_ITEM = "ADD_ITEM";
+const DEFAULT = "DEFAULT";
 
 const CustomBox = Box.extend`
   border-radius: 10px;
@@ -59,24 +65,28 @@ const stateMachine = {
 };
 
 export default class UserList extends React.Component {
-  state = { selectedList: "verified", showStatus: "all" };
-
-  handleClick = showType => {
-    this.setState({ selectedList: showType });
+  state = {
+    selectedList: "verified",
+    showStatus: "all",
+    users: mockUsers,
+    userName: ""
   };
 
-  handleStatus = event => {
-    this.setState({ showStatus: event.target.value });
+  reduce = action => {
+    console.log(action, actions, "ehllo");
+    const stateReducer = actions[action.type] || actions[DEFAULT];
+    console.log("BEFORE", this.state, action);
+    this.setState(stateReducer(action.payload), () => {
+      console.log("AFTER", this.state);
+    });
   };
+
   /* FP and state machine */
   getUsersList = () => {
-    const { showStatus, selectedList } = this.state;
-    return stateMachine[selectedList][showStatus](mockUsers);
+    const { showStatus, selectedList, users } = this.state;
+    console.log("showStatus", showStatus, selectedList);
+    return stateMachine[selectedList][showStatus](users);
   };
-  /* 
-     imperative implementation 
-
-  */
   render() {
     return (
       <Box width={1 / 2}>
@@ -85,7 +95,10 @@ export default class UserList extends React.Component {
             bg="papayawhip"
             color="palevioletred"
             className="verified-users-button"
-            onClick={this.handleClick.bind(null, "verified")}
+            onClick={this.reduce.bind(null, {
+              type: CHANGE_SHOW_TYPE,
+              payload: "verified"
+            })}
           >
             Verified
           </Button>
@@ -93,7 +106,10 @@ export default class UserList extends React.Component {
             bg="papayawhip"
             color="palevioletred"
             className="top-users-button"
-            onClick={this.handleClick.bind(null, "top")}
+            onClick={this.reduce.bind(null, {
+              type: CHANGE_SHOW_TYPE,
+              payload: "top"
+            })}
           >
             Top Users
           </Button>
@@ -101,7 +117,10 @@ export default class UserList extends React.Component {
             bg="papayawhip"
             color="palevioletred"
             className="anonymous-users-button"
-            onClick={this.handleClick.bind(null, "anonymous")}
+            onClick={this.reduce.bind(null, {
+              type: CHANGE_SHOW_TYPE,
+              payload: "anonymous"
+            })}
           >
             Anonymous
           </Button>
@@ -110,13 +129,44 @@ export default class UserList extends React.Component {
           <select
             name="showStatus"
             id="show-status-menu"
-            onChange={this.handleStatus}
+            onChange={event =>
+              this.reduce({
+                type: CHANGE_NAME,
+                payload: { name: event.target.name, value: event.target.value }
+              })
+            }
             value={this.state.showStatus}
           >
             <option value="all">All</option>
             <option value="active">Active</option>
             <option value="inactive">In Active</option>
           </select>
+        </Flex>
+        <Flex justifyContent="space-evenly">
+          <Box w={1 / 2}>
+            <Input
+              placeholder="Enter user name"
+              value={this.state.userName}
+              name="userName"
+              onChange={event =>
+                this.reduce({
+                  type: CHANGE_NAME,
+                  payload: {
+                    name: event.target.name,
+                    value: event.target.value
+                  }
+                })
+              }
+            />
+          </Box>
+          <Button
+            onClick={this.reduce.bind(null, {
+              type: ADD_ITEM,
+              payload: this.state.userName
+            })}
+          >
+            Add
+          </Button>
         </Flex>
         {this.getUsersList().map(user => (
           <UserItem key={user.name} isActive={user.isActive}>

@@ -33,7 +33,7 @@ describe("User List", () => {
     userListComp
       .find("select")
       .at(0)
-      .simulate("change", { target: { value: "all" } });
+      .simulate("change", { target: { value: "all", name: "showStatus" } });
 
     expect(userListComp.find("UserItem").length).toEqual(2);
   });
@@ -42,7 +42,7 @@ describe("User List", () => {
     userListComp
       .find("select")
       .at(0)
-      .simulate("change", { target: { value: "active" } });
+      .simulate("change", { target: { value: "active", name: "showStatus" } });
 
     expect(
       userListComp
@@ -58,7 +58,9 @@ describe("User List", () => {
     userListComp
       .find("select")
       .at(0)
-      .simulate("change", { target: { value: "inactive" } });
+      .simulate("change", {
+        target: { value: "inactive", name: "showStatus" }
+      });
 
     expect(
       userListComp
