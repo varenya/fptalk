@@ -73,7 +73,6 @@ export default class UserList extends React.Component {
   };
 
   reduce = action => {
-    console.log(action, actions, "ehllo");
     const stateReducer = actions[action.type] || actions[DEFAULT];
     console.log("BEFORE", this.state, action);
     this.setState(stateReducer(action.payload), () => {
