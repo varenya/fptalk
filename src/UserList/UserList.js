@@ -1,4 +1,5 @@
 import React from "react";
+import * as R from "ramda";
 import { css } from "glamor";
 
 function UserItem(props) {
@@ -67,6 +68,31 @@ let inputStyles = {
   fontFamily: "inherit",
   display: "inline-block",
   verticalAlign: "middle"
+const getUsers = (userType = "verified", filterFn = R.always(Boolean(true))) =>
+  R.pipe(R.groupBy(R.prop("type")), R.prop(userType), R.filter(filterFn));
+
+/* 
+
+ if curious about the pattern checkout xstate
+
+*/
+
+const stateMachine = {
+  verified: {
+    active: getUsers("verified", R.propEq("isActive", true)),
+    inactive: getUsers("verified", R.propEq("isActive", false)),
+    all: getUsers("verified")
+  },
+  top: {
+    active: getUsers("top", R.propEq("isActive", true)),
+    inactive: getUsers("top", R.propEq("isActive", false)),
+    all: getUsers("top")
+  },
+  anonymous: {
+    active: getUsers("anonymous", R.propEq("isActive", true)),
+    inactive: getUsers("anonymous", R.propEq("isActive", false)),
+    all: getUsers("anonymous")
+  }
 };
 
 export default class UserList extends React.Component {
@@ -84,48 +110,15 @@ export default class UserList extends React.Component {
   handleStatus = event => {
     this.setState({ showStatus: event.target.value });
   };
-
-  handleChange = event => {
-    const { name, value } = event.target;
-    this.setState({ [name]: value });
-  };
-
-  handleAdd = () => {
-    this.setState({
-      users: [
-        ...this.state.users,
-        { name: this.state.userName, isActive: true, type: "verified" }
-      ],
-      userName: ""
-    });
+  /* FP and state machine */
+  getUsersList = () => {
+    const { showStatus, selectedList } = this.state;
+    return stateMachine[selectedList][showStatus](mockUsers);
   };
   /* 
      imperative implementation 
 
   */
-  showSelectedList = () => {
-    let results = [];
-    const mockUsers = this.state.users;
-    for (let i = 0; i < mockUsers.length; i++) {
-      if (this.state.showStatus === "all") {
-        if (mockUsers[i].type === this.state.selectedList)
-          results.push(mockUsers[i]);
-      } else if (this.state.showStatus === "active") {
-        if (
-          mockUsers[i].type === this.state.selectedList &&
-          mockUsers[i].isActive
-        )
-          results.push(mockUsers[i]);
-      } else {
-        if (
-          mockUsers[i].type === this.state.selectedList &&
-          !mockUsers[i].isActive
-        )
-          results.push(mockUsers[i]);
-      }
-    }
-    return results;
-  };
   render() {
     return (
       <div {...css({ width: "50%" })}>
