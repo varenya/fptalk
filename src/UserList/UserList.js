@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Text, Button } from "rebass";
+import { Box, Flex, Text, Button, Heading } from "rebass";
 
 const CustomBox = Box.extend`
   border-radius: 10px;
@@ -21,17 +21,14 @@ function UserItem(props) {
   );
 }
 
-const mockUsers = [
-  { name: "varenya", type: "verified", isActive: true },
-  { name: "vara", type: "top", isActive: true },
-  { name: "uttam", type: "top", isActive: false },
-  { name: "niraj", type: "top", isActive: true },
-  { name: "vishwas", type: "verified", isActive: false },
-  { name: "manoj", type: "anonymous", isActive: true }
-];
-
 export default class UserList extends React.Component {
-  state = { selectedList: "verified", showStatus: "all" };
+  state = {
+    selectedList: "verified",
+    showStatus: "all",
+    loading: false,
+    error: false,
+    usersData: []
+  };
 
   handleClick = showType => {
     this.setState({ selectedList: showType });
@@ -40,12 +37,23 @@ export default class UserList extends React.Component {
   handleStatus = event => {
     this.setState({ showStatus: event.target.value });
   };
+
+  componentDidMount() {
+    this.setState({ loading: true });
+    fetch("http://localhost:3001/users")
+      .then(res => res.json())
+      .then(users => this.setState({ usersData: users, loading: false }))
+      .catch(err => {
+        this.setState({ loading: false, error: true });
+      });
+  }
   /* 
      imperative implementation 
 
   */
   showSelectedList = () => {
     let results = [];
+    const mockUsers = this.state.usersData;
     for (let i = 0; i < mockUsers.length; i++) {
       if (this.state.showStatus === "all") {
         if (mockUsers[i].type === this.state.selectedList)
@@ -67,6 +75,15 @@ export default class UserList extends React.Component {
     return results;
   };
   render() {
+    if (this.state.loading) {
+      return (
+        <Box p={50}>
+          <Heading>Loading..</Heading>
+        </Box>
+      );
+    } else if (this.state.error) {
+      return <Heading p={50}>Error</Heading>;
+    }
     return (
       <Box width={1 / 2}>
         <Flex justifyContent="space-evenly" pt={40}>
