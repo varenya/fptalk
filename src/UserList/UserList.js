@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Text, Button } from "rebass";
+import { Box, Flex, Text, Button, Input } from "rebass";
 
 const CustomBox = Box.extend`
   border-radius: 10px;
@@ -31,7 +31,12 @@ const mockUsers = [
 ];
 
 export default class UserList extends React.Component {
-  state = { selectedList: "verified", showStatus: "all" };
+  state = {
+    selectedList: "verified",
+    showStatus: "all",
+    userName: "",
+    users: mockUsers
+  };
 
   handleClick = showType => {
     this.setState({ selectedList: showType });
@@ -40,12 +45,28 @@ export default class UserList extends React.Component {
   handleStatus = event => {
     this.setState({ showStatus: event.target.value });
   };
+
+  handleChange = event => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  };
+
+  handleAdd = () => {
+    this.setState({
+      users: [
+        ...this.state.users,
+        { name: this.state.userName, isActive: true, type: "verified" }
+      ],
+      userName: ""
+    });
+  };
   /* 
      imperative implementation 
 
   */
   showSelectedList = () => {
     let results = [];
+    const mockUsers = this.state.users;
     for (let i = 0; i < mockUsers.length; i++) {
       if (this.state.showStatus === "all") {
         if (mockUsers[i].type === this.state.selectedList)
@@ -106,6 +127,17 @@ export default class UserList extends React.Component {
             <option value="active">Active</option>
             <option value="inactive">In Active</option>
           </select>
+        </Flex>
+        <Flex justifyContent="space-evenly">
+          <Box w={1 / 2}>
+            <Input
+              placeholder="Enter user name"
+              value={this.state.userName}
+              name="userName"
+              onChange={this.handleChange}
+            />
+          </Box>
+          <Button onClick={this.handleAdd}>Add</Button>
         </Flex>
         {this.showSelectedList().map(user => (
           <UserItem key={user.name} isActive={user.isActive}>
