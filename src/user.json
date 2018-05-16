@@ -1,0 +1,10 @@
+{
+  "users": [
+    { "name": "varenya", "type": "verified", "isActive": true },
+    { "name": "vara", "type": "top", "isActive": true },
+    { "name": "uttam", "type": "top", "isActive": false },
+    { "name": "niraj", "type": "top", "isActive": true },
+    { "name": "vishwas", "type": "verified", "isActive": false },
+    { "name": "manoj", "type": "anonymous", "isActive": true }
+  ]
+}

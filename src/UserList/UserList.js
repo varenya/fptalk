@@ -74,7 +74,9 @@ export default class UserList extends React.Component {
     selectedList: "verified",
     showStatus: "all",
     userName: "",
-    users: mockUsers
+    loading: false,
+    error: false,
+    usersData: []
   };
 
   handleClick = showType => {
@@ -99,13 +101,22 @@ export default class UserList extends React.Component {
       userName: ""
     });
   };
+  componentDidMount() {
+    this.setState({ loading: true });
+    fetch("http://localhost:3001/users")
+      .then(res => res.json())
+      .then(users => this.setState({ usersData: users, loading: false }))
+      .catch(err => {
+        this.setState({ loading: false, error: true });
+      });
+  }
   /* 
      imperative implementation 
 
   */
   showSelectedList = () => {
     let results = [];
-    const mockUsers = this.state.users;
+    const mockUsers = this.state.usersData;
     for (let i = 0; i < mockUsers.length; i++) {
       if (this.state.showStatus === "all") {
         if (mockUsers[i].type === this.state.selectedList)
@@ -127,6 +138,15 @@ export default class UserList extends React.Component {
     return results;
   };
   render() {
+    if (this.state.loading) {
+      return (
+        <Box p={50}>
+          <Heading>Loading..</Heading>
+        </Box>
+      );
+    } else if (this.state.error) {
+      return <Heading p={50}>Error</Heading>;
+    }
     return (
       <div {...css({ width: "50%" })}>
         <div
