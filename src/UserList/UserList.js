@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Flex, Text, Button } from "rebass";
+import * as R from "ramda";
 
 const CustomBox = Box.extend`
   border-radius: 10px;
@@ -30,6 +31,33 @@ const mockUsers = [
   { name: "manoj", type: "anonymous", isActive: true }
 ];
 
+const getUsers = (userType = "verified", filterFn = R.always(Boolean(true))) =>
+  R.pipe(R.groupBy(R.prop("type")), R.prop(userType), R.filter(filterFn));
+
+/* 
+
+ if curious about the pattern checkout xstate
+
+*/
+
+const stateMachine = {
+  verified: {
+    active: getUsers("verified", R.propEq("isActive", true)),
+    inactive: getUsers("verified", R.propEq("isActive", false)),
+    all: getUsers("verified")
+  },
+  top: {
+    active: getUsers("top", R.propEq("isActive", true)),
+    inactive: getUsers("top", R.propEq("isActive", false)),
+    all: getUsers("top")
+  },
+  anonymous: {
+    active: getUsers("anonymous", R.propEq("isActive", true)),
+    inactive: getUsers("anonymous", R.propEq("isActive", false)),
+    all: getUsers("anonymous")
+  }
+};
+
 export default class UserList extends React.Component {
   state = { selectedList: "verified", showStatus: "all" };
 
@@ -40,32 +68,15 @@ export default class UserList extends React.Component {
   handleStatus = event => {
     this.setState({ showStatus: event.target.value });
   };
+  /* FP and state machine */
+  getUsersList = () => {
+    const { showStatus, selectedList } = this.state;
+    return stateMachine[selectedList][showStatus](mockUsers);
+  };
   /* 
      imperative implementation 
 
   */
-  showSelectedList = () => {
-    let results = [];
-    for (let i = 0; i < mockUsers.length; i++) {
-      if (this.state.showStatus === "all") {
-        if (mockUsers[i].type === this.state.selectedList)
-          results.push(mockUsers[i]);
-      } else if (this.state.showStatus === "active") {
-        if (
-          mockUsers[i].type === this.state.selectedList &&
-          mockUsers[i].isActive
-        )
-          results.push(mockUsers[i]);
-      } else {
-        if (
-          mockUsers[i].type === this.state.selectedList &&
-          !mockUsers[i].isActive
-        )
-          results.push(mockUsers[i]);
-      }
-    }
-    return results;
-  };
   render() {
     return (
       <Box width={1 / 2}>
@@ -107,7 +118,7 @@ export default class UserList extends React.Component {
             <option value="inactive">In Active</option>
           </select>
         </Flex>
-        {this.showSelectedList().map(user => (
+        {this.getUsersList().map(user => (
           <UserItem key={user.name} isActive={user.isActive}>
             <Text fontSize={20} style={{ textTransform: "capitalize" }}>
               {user.name}
