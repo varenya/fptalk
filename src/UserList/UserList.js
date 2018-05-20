@@ -1,21 +1,19 @@
 import React from "react";
-import { Box, Flex, Text, Button, Input } from "rebass";
-
-const CustomBox = Box.extend`
-  border-radius: 10px;
-  background-color: ${props => (props.isActive ? "#efb85f" : "papayawhip")};
-`;
+import { css } from "glamor";
 
 function UserItem(props) {
   const { isActive, ...otherProps } = props;
   return (
-    <CustomBox
-      p={3}
-      mx={2}
-      my={4}
-      color="palevioletred"
-      width={1}
-      isActive={props.isActive}
+    <div
+      {...css({
+        padding: "20px",
+        textTransform: "capitalize",
+        margin: "25px 10px",
+        color: `${isActive ? "#fff" : "#0078e7"}`,
+        width: "100%",
+        borderRadius: "10px",
+        backgroundColor: `${isActive ? "#0078e7" : "#fff"}`
+      })}
       {...otherProps}
     />
   );
@@ -29,6 +27,47 @@ const mockUsers = [
   { name: "vishwas", type: "verified", isActive: false },
   { name: "manoj", type: "anonymous", isActive: true }
 ];
+
+const buttonStyle = {
+  backgroundColor: "#0078e7",
+  color: "#fff",
+  fontSize: "14px",
+  lineHeight: "1.1428571428571428",
+  margin: "0px",
+  paddingLeft: "16px",
+  paddingRight: "16px",
+  paddingTop: "8px",
+  paddingBottom: "8px",
+  borderRadius: "4px",
+  border: "0",
+  display: "inline-block",
+  verticalAlign: "middle",
+  textAlign: "center",
+  textDecoration: "none",
+  appearance: "none",
+  ":hover": {
+    boxShadow: "inset 0 0 0 999px rgba(0,0,0,0.125)"
+  }
+};
+
+let inputStyles = {
+  lineHeight: "inherit",
+  margin: "0px",
+  paddingLeft: "4px",
+  paddingRight: "4px",
+  paddingTop: "8px",
+  paddingBottom: "8px",
+  width: "100%",
+  border: "0",
+  borderColor: "#eee",
+  boxShadow: "inset 0 0 0 1px #eee",
+  borderRadius: "4px",
+  color: "inherit",
+  backgroundColor: "transparent",
+  fontFamily: "inherit",
+  display: "inline-block",
+  verticalAlign: "middle"
+};
 
 export default class UserList extends React.Component {
   state = {
@@ -89,34 +128,40 @@ export default class UserList extends React.Component {
   };
   render() {
     return (
-      <Box width={1 / 2}>
-        <Flex justifyContent="space-evenly" pt={40}>
-          <Button
-            bg="papayawhip"
-            color="palevioletred"
-            className="verified-users-button"
+      <div {...css({ width: "50%" })}>
+        <div
+          {...css({
+            justifyContent: "space-evenly",
+            margin: "20px",
+            display: "flex"
+          })}
+        >
+          <button
+            className={`${css(buttonStyle)} verified-users-button`}
             onClick={this.handleClick.bind(null, "verified")}
           >
             Verified
-          </Button>
-          <Button
-            bg="papayawhip"
-            color="palevioletred"
-            className="top-users-button"
+          </button>
+          <button
+            className={`${css(buttonStyle)} top-users-button`}
             onClick={this.handleClick.bind(null, "top")}
           >
             Top Users
-          </Button>
-          <Button
-            bg="papayawhip"
-            color="palevioletred"
-            className="anonymous-users-button"
+          </button>
+          <button
+            className={`${css(buttonStyle)} anonymous-users-button`}
             onClick={this.handleClick.bind(null, "anonymous")}
           >
             Anonymous
-          </Button>
-        </Flex>
-        <Flex justifyContent="center" m={20}>
+          </button>
+        </div>
+        <div
+          {...css({
+            justifyContent: "center",
+            margin: "20px",
+            display: "flex"
+          })}
+        >
           <select
             name="showStatus"
             id="show-status-menu"
@@ -127,26 +172,33 @@ export default class UserList extends React.Component {
             <option value="active">Active</option>
             <option value="inactive">In Active</option>
           </select>
-        </Flex>
-        <Flex justifyContent="space-evenly">
-          <Box w={1 / 2}>
-            <Input
+        </div>
+        <div {...css({ display: "flex", justifyContent: "space-evenly" })}>
+          <div {...css({ width: "50%" })}>
+            <input
+              {...css(inputStyles)}
               placeholder="Enter user name"
               value={this.state.userName}
               name="userName"
               onChange={this.handleChange}
             />
-          </Box>
-          <Button onClick={this.handleAdd}>Add</Button>
-        </Flex>
+          </div>
+          <button
+            {...css([
+              buttonStyle,
+              { backgroundColor: "#0067ee", color: "#fff" }
+            ])}
+            onClick={this.handleAdd}
+          >
+            Add
+          </button>
+        </div>
         {this.showSelectedList().map(user => (
           <UserItem key={user.name} isActive={user.isActive}>
-            <Text fontSize={20} style={{ textTransform: "capitalize" }}>
-              {user.name}
-            </Text>
+            {user.name}
           </UserItem>
         ))}
-      </Box>
+      </div>
     );
   }
 }

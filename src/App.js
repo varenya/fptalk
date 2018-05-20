@@ -1,19 +1,29 @@
 import React, { Component } from "react";
-import { Heading } from "rebass";
 import UserList from "./UserList";
-import { Box, Flex } from "rebass";
+import { css } from "glamor";
+
+let headerStyle = {
+  textAlign: "center",
+  padding: "40px",
+  color: "rgb(75, 75, 75)",
+  fontWeight: "normal"
+};
+
+let flexCenter = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+};
 
 class App extends Component {
   render() {
     return (
-      <Box>
-        <Heading textAlign="center" pt={40} color="palevioletred">
-          User List
-        </Heading>
-        <Flex alignItems="center" justifyContent="center">
+      <div {...css({ fontFamily: "sans-serif" })}>
+        <h1 className={css(headerStyle)}>User List</h1>
+        <div className={css(flexCenter)}>
           <UserList />
-        </Flex>
-      </Box>
+        </div>
+      </div>
     );
   }
 }
