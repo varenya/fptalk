@@ -9,7 +9,6 @@ const CHANGE_SHOW_TYPE = "CHANGE_SHOW_TYPE";
 const ADD_ITEM = "ADD_ITEM";
 const DEFAULT = "DEFAULT";
 
-
 function UserItem(props) {
   const { isActive, ...otherProps } = props;
   return (
@@ -76,6 +75,8 @@ let inputStyles = {
   fontFamily: "inherit",
   display: "inline-block",
   verticalAlign: "middle"
+};
+
 const getUsers = (userType = "verified", filterFn = R.always(Boolean(true))) =>
   R.pipe(R.groupBy(R.prop("type")), R.prop(userType), R.filter(filterFn));
 
@@ -137,19 +138,28 @@ export default class UserList extends React.Component {
         >
           <button
             className={`${css(buttonStyle)} verified-users-button`}
-            onClick={this.handleClick.bind(null, "verified")}
+            onClick={this.reduce.bind(null, {
+              type: CHANGE_SHOW_TYPE,
+              payload: "verified"
+            })}
           >
             Verified
           </button>
           <button
             className={`${css(buttonStyle)} top-users-button`}
-            onClick={this.handleClick.bind(null, "top")}
+            onClick={this.reduce.bind(null, {
+              type: CHANGE_SHOW_TYPE,
+              payload: "top"
+            })}
           >
             Top Users
           </button>
           <button
             className={`${css(buttonStyle)} anonymous-users-button`}
-            onClick={this.handleClick.bind(null, "anonymous")}
+            onClick={this.reduce.bind(null, {
+              type: CHANGE_SHOW_TYPE,
+              payload: "anonymous"
+            })}
           >
             Anonymous
           </button>
@@ -184,7 +194,15 @@ export default class UserList extends React.Component {
               placeholder="Enter user name"
               value={this.state.userName}
               name="userName"
-              onChange={this.handleChange}
+              onChange={event =>
+                this.reduce({
+                  type: CHANGE_NAME,
+                  payload: {
+                    name: event.target.name,
+                    value: event.target.value
+                  }
+                })
+              }
             />
           </div>
           <button
@@ -192,7 +210,10 @@ export default class UserList extends React.Component {
               buttonStyle,
               { backgroundColor: "#0067ee", color: "#fff" }
             ])}
-            onClick={this.handleAdd}
+            onClick={this.reduce.bind(null, {
+              type: ADD_ITEM,
+              payload: this.state.userName
+            })}
           >
             Add
           </button>
