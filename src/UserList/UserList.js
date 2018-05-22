@@ -108,7 +108,6 @@ export default class UserList extends React.Component {
   state = {
     selectedList: "verified",
     showStatus: "all",
-    users: mockUsers,
     userName: ""
   };
 
@@ -122,8 +121,9 @@ export default class UserList extends React.Component {
 
   /* FP and state machine */
   getUsersList = () => {
-    const { showStatus, selectedList, users } = this.state;
-    console.log("showStatus", showStatus, selectedList);
+    const { showStatus, selectedList } = this.state;
+    const { users } = this.props;
+    console.log("showStatus", showStatus, selectedList, users);
     return stateMachine[selectedList][showStatus](users);
   };
   render() {
