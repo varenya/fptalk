@@ -140,12 +140,12 @@ export default class UserList extends React.Component {
   render() {
     if (this.state.loading) {
       return (
-        <Box p={50}>
-          <Heading>Loading..</Heading>
-        </Box>
+        <div {...css({ padding: "50px" })}>
+          <h1>Loading..</h1>
+        </div>
       );
     } else if (this.state.error) {
-      return <Heading p={50}>Error</Heading>;
+      return <h1 {...css({ padding: "50px" , color :"#900"})}>Error</h1>;
     }
     return (
       <div {...css({ width: "50%" })}>
