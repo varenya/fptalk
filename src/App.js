@@ -36,7 +36,7 @@ class App extends Component {
           <Loader
             url="http://localhost:3001/users"
             render={{
-              initial: () => <div>INITIAL</div>,
+              initial: () => <div>Not doing much</div>,
               loading: () => <h1 {...css({ padding: "50px" })}>LOADING..</h1>,
               error: error => (
                 <div {...css({ color: "#900", textTransform: "uppercase" })}>
